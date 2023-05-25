@@ -20,16 +20,19 @@ function startGame(){
     game.textAlign = 'end';
     
      // se crea una variable donde se extrae el primer mapa del arreglo maps
-     const map = maps[0];
+    const map = maps[0];
     //Agarramos el mapa del array de mapas y le quitamos los espacios en blanco al inicio y al final
     //con trim y luego con split creamos un arreglo donde el inicio y el final de cada elemento se
     //marca por los saltos de linea '\n'
-     const mapRows = map.trim().split('\n');
+    const mapRows = map.trim().split('\n');
     //Del array resultante usamos map para recorrer cada uno de sus elementos (rows) limpiando los
     //espacios en blanco con trim y luego separandolos por "filas" con split
-     const mapRowCols = mapRows.map(row => row.trim().split(''));
-     console.log({map,mapRows, mapRowCols});
- 
+    const mapRowCols = mapRows.map(row => row.trim().split(''));
+    console.log({map,mapRows, mapRowCols});
+    // lispiamos todo el canvas para luego volver a renderizar 
+    game.clearRect(0,0, canvasSize, canvasSize)
+
+
      // for (let row = 1; row <= 10; row++) {
      //     for (let col = 1; col <= 10 ; col++) {
      //         //dibuja una cadena de texto en las coordenadas especificadas .fill(caracter,x,y)
@@ -37,51 +40,36 @@ function startGame(){
      // }
      // }
 
+
      //Recorremos con for each el array bidimensional a partir del string del map y recibimos dos parametros su valor y su indice
-     mapRowCols.forEach((row, rowI) => {
+    mapRowCols.forEach((row, rowI) => {
         //Recorremos las filas iterando sobre cada columna y recibimos su valor y su indice
-         row.forEach((col,colI) => {
+        row.forEach((col,colI) => {
             //Declaramos que valor tendra el emoji en esa columna
-             emoji = emojis[col];
+            emoji = emojis[col];
              //Definimos el posicionamiento que tendra en horizontal y vertical esa columna al 
              //alinearse en el canvas (ej: elementsSize vale 60 el elemento se insertara en el 
              //medio que seria 30)
-             const posX = (elementSize*(colI+1))+10;
-             const posY = (elementSize*(rowI+1))-5;
+            const posX = (elementSize*(colI+1))+10;
+            const posY = (elementSize*(rowI+1))-5;
              //Llenamos en nuestro canvas con cada iteracion
-             game.fillText(emoji,posX,posY);
+            game.fillText(emoji,posX,posY);
             //Solo le damos coordenadas a la posicion del jugador si aun no fueron dadas (si no fue
             //definida en x no hace falta verificar que no haya sido definida en y ya que siempre 
             //se definen las dos)
-             if (col =='O'){
-                 playerPosition.x = posX;
-                 playerPosition.y = posY;
-                 console.log({playerPosition});
-             }
-         });
-         
-     });
-
-    movePlayer();
-}
-
-function renderMap(){
-
-    const map = maps[0];
-    const mapRows = map.trim().split('\n');
-
-    const mapRowCols = mapRows.map(row => row.trim().split(''));
-    console.log({map,mapRows, mapRowCols});
-    mapRowCols.forEach((row, rowI) => {
-        row.forEach((col,colI) => {
-            emoji = emojis[col];
-            const posX = (elementSize*(colI+1))+10;
-            const posY = (elementSize*(rowI+1))-5;
-
-            game.fillText(emoji,posX,posY);
+            if (col =='O'){
+                //preguntamos si ninguno de estos elementos tiene algo adentro
+                if(!playerPosition.x && !playerPosition.y){
+                    playerPosition.x = posX;
+                    playerPosition.y = posY;
+                    console.log({playerPosition});
+                }
+            }
         });
         
     });
+
+    movePlayer();
 }
 
 function setCanvasSize (){
@@ -115,31 +103,24 @@ function clearmap(){
 
 function moverArriba(){
     console.log('moverarriba');
-    clearmap()
     playerPosition.y -= elementSize 
-    renderMap();
-    movePlayer();
+    startGame();
+
 }
 function moverAbajo(){
     console.log('moverabajo');
-    clearmap()
     playerPosition.y += elementSize 
-    renderMap();
-    movePlayer();
+    startGame();
 }
 function moverDerecha(){
     console.log('moverderecha');
-    clearmap()
     playerPosition.x += elementSize 
-    renderMap();
-    movePlayer();
+    startGame();
 }
 function moverIzquierda(){
     console.log('moverizquierda');
-    clearmap()
     playerPosition.x -= elementSize 
-    renderMap();
-    movePlayer();
+    startGame();
 }
 
 
