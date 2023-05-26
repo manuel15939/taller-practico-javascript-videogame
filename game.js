@@ -11,7 +11,28 @@ const playerPosition ={
 // Espera a que cargue el contenido html de la pagina antes de lanzar la funcion
 window.addEventListener('load',setCanvasSize);
 window.addEventListener('resize',setCanvasSize);
-window.addEventListener('keydown', moveByKey)
+window.addEventListener('keydown', moveByKey);
+
+function setCanvasSize (){
+    // con este condicional se le da las dimensiones al mapa para que siempre sea cuadrado
+    if (window.innerHeight > window.innerWidth ){
+         canvasSize = window.innerWidth * 0.8;
+    }else{
+         canvasSize = window.innerHeight * 0.8;
+    }
+
+     //Dependiendo del tamaño de la pantalla, va a colocar el tamaño cuadrado del canvas
+     //Al dividir entre 10 y luego aproximar el valor a un entero garantiza que el canvas 
+     //será un entero múltiplo de 10. Finalmente se multiplica la expresión por 10 para 
+     //obtener el dato real del canvas
+
+     // se introducen las dimensiones del canvas 
+    canvas.setAttribute('width',  canvasSize);
+    canvas.setAttribute('height', canvasSize);
+     // sele da dimensiones al los objetos dentro del mapa
+    elementSize = (canvasSize/10);
+    startGame();
+}
 
 function startGame(){
     console.log({canvasSize, elementSize});
@@ -30,7 +51,7 @@ function startGame(){
     const mapRowCols = mapRows.map(row => row.trim().split(''));
     console.log({map,mapRows, mapRowCols});
     // lispiamos todo el canvas para luego volver a renderizar 
-    game.clearRect(0,0, canvasSize, canvasSize)
+    game.clearRect(0,0, canvasSize, canvasSize);
 
 
      // for (let row = 1; row <= 10; row++) {
@@ -50,10 +71,9 @@ function startGame(){
              //Definimos el posicionamiento que tendra en horizontal y vertical esa columna al 
              //alinearse en el canvas (ej: elementsSize vale 60 el elemento se insertara en el 
              //medio que seria 30)
-            const posX = (elementSize*(colI+1))+10;
-            const posY = (elementSize*(rowI+1))-5;
-             //Llenamos en nuestro canvas con cada iteracion
-            game.fillText(emoji,posX,posY);
+            const posX = elementSize * (colI+1);
+            const posY = elementSize * (rowI+1);
+            
             //Solo le damos coordenadas a la posicion del jugador si aun no fueron dadas (si no fue
             //definida en x no hace falta verificar que no haya sido definida en y ya que siempre 
             //se definen las dos)
@@ -65,6 +85,9 @@ function startGame(){
                     console.log({playerPosition});
                 }
             }
+
+             //Llenamos en nuestro canvas con cada iteracion
+            game.fillText(emoji,posX,posY);
         });
         
     });
@@ -72,55 +95,46 @@ function startGame(){
     movePlayer();
 }
 
-function setCanvasSize (){
-   // con este condicional se le da las dimensiones al mapa para que siempre sea cuadrado
-    if (window.innerWidth < window.innerHeight){
-        canvasSize = window.innerWidth * 0.8
-    }else{
-        canvasSize = window.innerHeight * 0.8
-    }
-
-    //Dependiendo del tamaño de la pantalla, va a colocar el tamaño cuadrado del canvas
-    //Al dividir entre 10 y luego aproximar el valor a un entero garantiza que el canvas 
-    //será un entero múltiplo de 10. Finalmente se multiplica la expresión por 10 para 
-    //obtener el dato real del canvas
-
-    // se introducen las dimensiones del canvas 
-    canvas.setAttribute('width',  canvasSize);
-    canvas.setAttribute('height', canvasSize);
-    // sele da dimensiones al los objetos dentro del mapa
-    elementSize = (canvasSize/10)-2;
-    startGame()
-}
 
 function movePlayer (){
-    game.fillText(emojis['PLAYER'], playerPosition.x,playerPosition.y)
+    game.fillText(emojis['PLAYER'], playerPosition.x, playerPosition.y);
 }
 
-function clearmap(){
-    game.clearRect(0,0, canvasSize, canvasSize)
-}
 
 function moverArriba(){
     console.log('moverarriba');
-    playerPosition.y -= elementSize 
-    startGame();
-
+    if ((playerPosition.y - elementSize) < elementSize){
+        console.log('out');
+    }else{
+        playerPosition.y -= elementSize 
+        startGame();
+    }
+    
 }
+
 function moverAbajo(){
     console.log('moverabajo');
-    playerPosition.y += elementSize 
-    startGame();
+    if ((playerPosition.y + elementSize) > canvasSize){
+        console.log('out');
+    }else{
+        playerPosition.y += elementSize 
+        startGame();
+    }
 }
+
 function moverDerecha(){
     console.log('moverderecha');
-    playerPosition.x += elementSize 
-    startGame();
+    if ((playerPosition.x + elementSize) <= canvasSize){
+        playerPosition.x += elementSize
+        startGame();
+    }
 }
 function moverIzquierda(){
     console.log('moverizquierda');
-    playerPosition.x -= elementSize 
-    startGame();
+    if ((playerPosition.x - elementSize) >= elementSize){
+        playerPosition.x -= elementSize 
+        startGame();
+    }
 }
 
 
