@@ -6,20 +6,24 @@ let elementSize;
 const playerPosition ={
     x : undefined,
     y : undefined,
+};
+
+const giftPosition = {
+    x : undefined,
+    y : undefined,
 }
 
 // Espera a que cargue el contenido html de la pagina antes de lanzar la funcion
 window.addEventListener('load',setCanvasSize);
 window.addEventListener('resize',setCanvasSize);
-window.addEventListener('keydown', moveByKey);
 
 function setCanvasSize (){
     // con este condicional se le da las dimensiones al mapa para que siempre sea cuadrado
     if (window.innerHeight > window.innerWidth ){
-         canvasSize = window.innerWidth * 0.8;
+         canvasSize = Math.trunc(window.innerWidth * 0.8) ;
     }else{
-         canvasSize = window.innerHeight * 0.8;
-    }
+         canvasSize = Math.trunc(window.innerHeight * 0.8) ;
+    };
 
      //Dependiendo del tamaño de la pantalla, va a colocar el tamaño cuadrado del canvas
      //Al dividir entre 10 y luego aproximar el valor a un entero garantiza que el canvas 
@@ -30,7 +34,7 @@ function setCanvasSize (){
     canvas.setAttribute('width',  canvasSize);
     canvas.setAttribute('height', canvasSize);
      // sele da dimensiones al los objetos dentro del mapa
-    elementSize = (canvasSize/10);
+    elementSize = canvasSize/10;
     startGame();
 }
 
@@ -71,8 +75,8 @@ function startGame(){
              //Definimos el posicionamiento que tendra en horizontal y vertical esa columna al 
              //alinearse en el canvas (ej: elementsSize vale 60 el elemento se insertara en el 
              //medio que seria 30)
-            const posX = elementSize * (colI+1);
-            const posY = elementSize * (rowI+1);
+            const posX = elementSize* (colI+1);
+            const posY = elementSize* (rowI+1);
             
             //Solo le damos coordenadas a la posicion del jugador si aun no fueron dadas (si no fue
             //definida en x no hace falta verificar que no haya sido definida en y ya que siempre 
@@ -84,9 +88,11 @@ function startGame(){
                     playerPosition.y = posY;
                     console.log({playerPosition});
                 }
+            }else if (col == 'I'){
+                giftPosition.x = posX;
+                giftPosition.y = posY;
             }
-
-             //Llenamos en nuestro canvas con cada iteracion
+            //Llenamos en nuestro canvas con cada iteracion
             game.fillText(emoji,posX,posY);
         });
         
@@ -96,10 +102,20 @@ function startGame(){
 }
 
 
+
 function movePlayer (){
-    game.fillText(emojis['PLAYER'], playerPosition.x, playerPosition.y);
+    const giftCollisionX = playerPosition.x.toFixed(3) == giftPosition.x.toFixed(3);
+    const giftCollisionY = playerPosition.y.toFixed(3) == giftPosition.y.toFixed(3);
+    const giftCollision = giftCollisionX && giftCollisionY;
+
+    if (giftCollision){
+        console.log('Subiste de nivel');
+    }
+
+    game.fillText(emojis['PLAYER'], playerPosition.x,playerPosition.y)
 }
 
+window.addEventListener('keydown', moveByKey);
 
 function moverArriba(){
     console.log('moverarriba');
@@ -110,8 +126,8 @@ function moverArriba(){
         startGame();
     }
     
-}
 
+}
 function moverAbajo(){
     console.log('moverabajo');
     if ((playerPosition.y + elementSize) > canvasSize){
@@ -121,18 +137,20 @@ function moverAbajo(){
         startGame();
     }
 }
-
 function moverDerecha(){
     console.log('moverderecha');
-    if ((playerPosition.x + elementSize) <= canvasSize){
+    if ((playerPosition.x + elementSize) > canvasSize){
+        console.log('out');
+    }else{
         playerPosition.x += elementSize
         startGame();
     }
 }
 function moverIzquierda(){
-    console.log('moverizquierda');
-    if ((playerPosition.x - elementSize) >= elementSize){
-        playerPosition.x -= elementSize 
+    if ((playerPosition.x - elementSize) < elementSize){
+        console.log('out');
+    }else{
+        playerPosition.x -= elementSize
         startGame();
     }
 }
