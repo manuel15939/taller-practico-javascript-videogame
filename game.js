@@ -2,6 +2,7 @@ const canvas = document.querySelector('#game');
 const game = canvas.getContext('2d');
 let canvasSize;
 let elementSize;
+let level = 0;
 
 const playerPosition ={
     x : undefined,
@@ -48,12 +49,19 @@ function setCanvasSize (){
 
 function startGame(){
     console.log({canvasSize, elementSize});
+    // se le da tamaño a los objetos
     game.font = elementSize +'px Verdana';
     //alinea el objeto o texto a la izquierda o derecha 
     game.textAlign = 'end';
     
      // se crea una variable donde se extrae el primer mapa del arreglo maps
-    const map = maps[0];
+    const map = maps[level];
+    // se crea una condicion para que cuando no halla mas mapas no se renderize de nuevo y termine 
+    // el juego
+    if (!map){
+        gameWin();
+        return;
+    }
     //Agarramos el mapa del array de mapas y le quitamos los espacios en blanco al inicio y al final
     //con trim y luego con split creamos un arreglo donde el inicio y el final de cada elemento se
     //marca por los saltos de linea '\n'
@@ -62,6 +70,8 @@ function startGame(){
     //espacios en blanco con trim y luego separandolos por "filas" con split
     const mapRowCols = mapRows.map(row => row.trim().split(''));
     console.log({map,mapRows, mapRowCols});
+    // reasignamos un array vacio al array que guarda las posiciones de los objetos enemigos
+    // ya que siempre que se haga un movimiento duplicara las posiiones de los objetos enemigos
     bombas = [];
     // lispiamos todo el canvas para luego volver a renderizar 
     game.clearRect(0,0, canvasSize, canvasSize);
@@ -99,10 +109,12 @@ function startGame(){
                     playerPosition.y = posY;
                     console.log({playerPosition});
                 }
-            }else if (col == 'I'){
+            }// con este condicional guardamos las coordenadas de la meta
+            else if (col == 'I'){
                 giftPosition.x = posX;
                 giftPosition.y = posY;
-            }else if (col == 'X'){
+            } // con este condicional guardamos las cordenadas de los objetos enemigos
+            else if (col == 'X'){
                 bombas.push({
                     x: posX,
                     y: posY,
@@ -122,26 +134,47 @@ function startGame(){
 
 
 function movePlayer (){
+    // se compara la posicion de la meta en el eje x con la posicion del jugador y devuelve un true
     const giftCollisionX = playerPosition.x.toFixed(3) == giftPosition.x.toFixed(3);
+    // se compara la posicion de la meta en el eje y con la posicion del jugador y devuelve un true
     const giftCollisionY = playerPosition.y.toFixed(3) == giftPosition.y.toFixed(3);
+    // compara si las dos posiciones tanto en x como en y su estado es true
     const giftCollision = giftCollisionX && giftCollisionY;
-
+    // esta condicion se ejecuta si en giftCollisin su estado es true
     if (giftCollision){
-        console.log('Subiste de nivel');
+        levelWin();
     }
-
-    
+    // se busca si las posiciones de los objetos enemigos coninciden con la posicion del jugador
     const bombasCollision = bombas.find(bomba => {
+        // se compara la posicion de los objetos enemiogos en el eje x con la posicion del jugador y devuelve un true
         const bombaCollisionX = bomba.x == playerPosition.x;
+        // se compara la posicion de los objetos enemiogos en el eje x con la posicion del jugador y devuelve un true
         const bombaCollisionY = bomba.y == playerPosition.y;
+        // se devuelve un true si las dos variables cumplen con ese estado
         return bombaCollisionX && bombaCollisionY
     })
-
+    // esta condicion se ejecuta si en bombasCollision su estado es true
     if (bombasCollision){
-        console.log('chocaste con una bomba');
+        repeatLevel()
     }
 
     game.fillText(emojis['PLAYER'], playerPosition.x,playerPosition.y)
+}
+// se crea una funcion que permita subir de nivel y se renderize un nuevo mapa
+function levelWin(){
+    console.log('Subiste de nivel');
+    level++;
+    startGame()
+}
+
+function gameWin(){
+    console.log('Ganaste');
+}
+
+function repeatLevel(){
+    console.log('chocaste con una bomba');
+    playerPosition.x = door.x ;
+    playerPosition.y = door.y ;
 }
 
 window.addEventListener('keydown', moveByKey);
