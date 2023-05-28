@@ -13,6 +13,14 @@ const giftPosition = {
     y : undefined,
 }
 
+const door = {
+    x : undefined,
+    y : undefined,
+}
+
+let bombas = [];
+
+
 // Espera a que cargue el contenido html de la pagina antes de lanzar la funcion
 window.addEventListener('load',setCanvasSize);
 window.addEventListener('resize',setCanvasSize);
@@ -54,6 +62,7 @@ function startGame(){
     //espacios en blanco con trim y luego separandolos por "filas" con split
     const mapRowCols = mapRows.map(row => row.trim().split(''));
     console.log({map,mapRows, mapRowCols});
+    bombas = [];
     // lispiamos todo el canvas para luego volver a renderizar 
     game.clearRect(0,0, canvasSize, canvasSize);
 
@@ -82,6 +91,8 @@ function startGame(){
             //definida en x no hace falta verificar que no haya sido definida en y ya que siempre 
             //se definen las dos)
             if (col =='O'){
+                door.x = posX;
+                door.y = posY;
                 //preguntamos si ninguno de estos elementos tiene algo adentro
                 if(!playerPosition.x && !playerPosition.y){
                     playerPosition.x = posX;
@@ -91,7 +102,13 @@ function startGame(){
             }else if (col == 'I'){
                 giftPosition.x = posX;
                 giftPosition.y = posY;
+            }else if (col == 'X'){
+                bombas.push({
+                    x: posX,
+                    y: posY,
+                })
             }
+
             //Llenamos en nuestro canvas con cada iteracion
             game.fillText(emoji,posX,posY);
         });
@@ -99,8 +116,9 @@ function startGame(){
     });
 
     movePlayer();
-}
+    
 
+}
 
 
 function movePlayer (){
@@ -110,6 +128,17 @@ function movePlayer (){
 
     if (giftCollision){
         console.log('Subiste de nivel');
+    }
+
+    
+    const bombasCollision = bombas.find(bomba => {
+        const bombaCollisionX = bomba.x == playerPosition.x;
+        const bombaCollisionY = bomba.y == playerPosition.y;
+        return bombaCollisionX && bombaCollisionY
+    })
+
+    if (bombasCollision){
+        console.log('chocaste con una bomba');
     }
 
     game.fillText(emojis['PLAYER'], playerPosition.x,playerPosition.y)
