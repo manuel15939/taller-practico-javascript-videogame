@@ -3,6 +3,7 @@ const game = canvas.getContext('2d');
 let canvasSize;
 let elementSize;
 let level = 0;
+let lives = 3;
 
 const playerPosition ={
     x : undefined,
@@ -128,8 +129,6 @@ function startGame(){
     });
 
     movePlayer();
-    
-
 }
 
 
@@ -147,9 +146,9 @@ function movePlayer (){
     // se busca si las posiciones de los objetos enemigos coninciden con la posicion del jugador
     const bombasCollision = bombas.find(bomba => {
         // se compara la posicion de los objetos enemiogos en el eje x con la posicion del jugador y devuelve un true
-        const bombaCollisionX = bomba.x == playerPosition.x;
+        const bombaCollisionX = bomba.x.toFixed(3) == playerPosition.x.toFixed(3);
         // se compara la posicion de los objetos enemiogos en el eje x con la posicion del jugador y devuelve un true
-        const bombaCollisionY = bomba.y == playerPosition.y;
+        const bombaCollisionY = bomba.y.toFixed(3) == playerPosition.y.toFixed(3);
         // se devuelve un true si las dos variables cumplen con ese estado
         return bombaCollisionX && bombaCollisionY
     })
@@ -173,8 +172,19 @@ function gameWin(){
 
 function repeatLevel(){
     console.log('chocaste con una bomba');
-    playerPosition.x = door.x ;
-    playerPosition.y = door.y ;
+    //Se rreduce el numero de vidas 
+    lives--;
+    // este condicional valida si el numero de vidas es menor que 0, para reiniciar al primer nivel
+    // y tres vidas mas
+    if (lives <= 0){
+        level = 0;
+        lives = 3;
+    }
+    console.log('vidas'+'='+lives);
+    // se coloca undefine para reiniciar la posicion del jugador
+    playerPosition.x = undefined;
+    playerPosition.y = undefined;
+    startGame();
 }
 
 window.addEventListener('keydown', moveByKey);
