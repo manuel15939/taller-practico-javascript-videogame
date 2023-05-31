@@ -1,6 +1,8 @@
 const canvas = document.querySelector('#game');
 const spanLives = document.querySelector('#lives');
 const spanTime = document.querySelector('#time');
+const spanRecord = document.querySelector('#record');
+const pResult = document.querySelector('#mensaje');
 const game = canvas.getContext('2d');
 let canvasSize;
 let elementSize;
@@ -70,7 +72,9 @@ function startGame(){
         //se asigna el valor del instante en que se inicia el juego
         timeStart = Date.now();
         // se asigna un metodo que ejecuta la funcion showTime cada 100 ms
-        timeInterval= setInterval(showTime,100)
+        timeInterval= setInterval(showTime,100);
+        // se llama la funcion 
+        showRecord();
     }
     
     showLives();
@@ -179,11 +183,30 @@ function levelWin(){
 // funcion que termina el juego
 function gameWin(){
     console.log('Ganaste');
+    // termina con la ejecucion del setinterval que ejecuta showTime
     clearInterval(timeInterval);
-    localStorage.setItem('record', timePlayer);
-    if(localStorage.getItem('record') > timePlayer){
+    // se le asigna el valor que esta alojado en record en el local storage
+    const recordTime = localStorage.getItem('record');
+    // condicional que nos permite validar si hay algo en recordTime
+    if(recordTime){
+        
+        if (recordTime > timePlayer){
+            // si cordTiem es mayor a timePlayer se guarda en recor el valor del tiempo del jugador
+            // e impreme un mensaje
+            localStorage.setItem('record', timePlayer);
+            pResult.innerHTML = 'Superaste el record!!'
+        }else {
+            // si no solo imprime un mensaje
+            pResult.innerHTML = 'Lo siento, no supersate el record'
+        }
+    }else{
+        // de no cumplirse con el condicional solo se envia el valor de tiempo que se obtuvo 
+        //por primera vez y se imprime un mensaje
         localStorage.setItem('record', timePlayer);
+
+        pResult.innerHTML = 'Primera vez?, intenta superar tu tiempo'
     }
+    console.log({recordTime,timePlayer});
 }
 // funcion que muestra el numero de vidas 
 function showLives (){
@@ -207,6 +230,11 @@ function showTime(){
     spanTime.innerHTML = timePlayer ;
     
 }
+
+function showRecord(){
+    spanRecord.innerHTML = localStorage.getItem('record'); 
+}
+
 // funcion que nos permite repetir el nivel
 function repeatLevel(){
     console.log('chocaste con una bomba');
