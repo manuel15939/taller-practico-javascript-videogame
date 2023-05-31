@@ -1,9 +1,15 @@
 const canvas = document.querySelector('#game');
+const spanLives = document.querySelector('#lives');
+const spanTime = document.querySelector('#time');
 const game = canvas.getContext('2d');
 let canvasSize;
 let elementSize;
 let level = 0;
 let lives = 3;
+let timeStart ;
+let timePlayer;
+let timeInterval;
+
 
 const playerPosition ={
     x : undefined,
@@ -15,12 +21,8 @@ const giftPosition = {
     y : undefined,
 }
 
-const door = {
-    x : undefined,
-    y : undefined,
-}
-
 let bombas = [];
+
 
 
 // Espera a que cargue el contenido html de la pagina antes de lanzar la funcion
@@ -63,6 +65,16 @@ function startGame(){
         gameWin();
         return;
     }
+    // condicional que pregunta si hay algun valor en la variable timeStart 
+    if(!timeStart){
+        //se asigna el valor del instante en que se inicia el juego
+        timeStart = Date.now();
+        // se asigna un metodo que ejecuta la funcion showTime cada 100 ms
+        timeInterval= setInterval(showTime,100)
+    }
+    
+    showLives();
+
     //Agarramos el mapa del array de mapas y le quitamos los espacios en blanco al inicio y al final
     //con trim y luego con split creamos un arreglo donde el inicio y el final de cada elemento se
     //marca por los saltos de linea '\n'
@@ -102,8 +114,6 @@ function startGame(){
             //definida en x no hace falta verificar que no haya sido definida en y ya que siempre 
             //se definen las dos)
             if (col =='O'){
-                door.x = posX;
-                door.y = posY;
                 //preguntamos si ninguno de estos elementos tiene algo adentro
                 if(!playerPosition.x && !playerPosition.y){
                     playerPosition.x = posX;
@@ -166,10 +176,38 @@ function levelWin(){
     startGame()
 }
 
+// funcion que termina el juego
 function gameWin(){
     console.log('Ganaste');
+    clearInterval(timeInterval);
+    localStorage.setItem('record', timePlayer);
+    if(localStorage.getItem('record') > timePlayer){
+        localStorage.setItem('record', timePlayer);
+    }
 }
-
+// funcion que muestra el numero de vidas 
+function showLives (){
+    // se crea una constante que contenga un array con el numero de vidas que tiene el jugador
+    const heartArray = Array(lives).fill(emojis['HEART']);
+    console.log(heartArray);
+    // se imprime el numero de vidas del jugador 
+    spanLives.innerHTML = emojis['HEART'].repeat(lives);
+    // for (let i = 0; i < heartArray.length; i++) {
+    //     spanLives.innerHTML += heartArray[i]
+        
+    // }
+    
+}
+// funcion que muestra el tiempo
+function showTime(){
+    // se le asigna a la variable global el valor del tiempo actual menos el tiempo en el que
+    // se inica el juego
+    timePlayer = Date.now()-timeStart;
+    // se imprime el valor del tiempo en html
+    spanTime.innerHTML = timePlayer ;
+    
+}
+// funcion que nos permite repetir el nivel
 function repeatLevel(){
     console.log('chocaste con una bomba');
     //Se rreduce el numero de vidas 
@@ -179,6 +217,7 @@ function repeatLevel(){
     if (lives <= 0){
         level = 0;
         lives = 3;
+        timeStart = undefined;
     }
     console.log('vidas'+'='+lives);
     // se coloca undefine para reiniciar la posicion del jugador
