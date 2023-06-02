@@ -12,8 +12,16 @@ let timeStart ;
 let timePlayer;
 let timeInterval;
 
+const canvasSizeOld = {
+    old : undefined,
+} 
 
 const playerPosition ={
+    x : undefined,
+    y : undefined,
+};
+
+const playerPositionOld ={
     x : undefined,
     y : undefined,
 };
@@ -32,11 +40,13 @@ window.addEventListener('load',setCanvasSize);
 window.addEventListener('resize',setCanvasSize);
 
 function setCanvasSize (){
+    canvasSizeOld.old = canvasSize
+    
     // con este condicional se le da las dimensiones al mapa para que siempre sea cuadrado
     if (window.innerHeight > window.innerWidth ){
-         canvasSize = Math.trunc(window.innerWidth * 0.8) ;
+         canvasSize = Math.trunc(window.innerWidth * 0.7) ;
     }else{
-         canvasSize = Math.trunc(window.innerHeight * 0.8) ;
+         canvasSize = Math.trunc(window.innerHeight * 0.7) ;
     };
 
      //Dependiendo del tamaño de la pantalla, va a colocar el tamaño cuadrado del canvas
@@ -49,11 +59,12 @@ function setCanvasSize (){
     canvas.setAttribute('height', canvasSize);
      // sele da dimensiones al los objetos dentro del mapa
     elementSize = canvasSize/10;
+    reposicionar()
     startGame();
 }
 
 function startGame(){
-    console.log({canvasSize, elementSize});
+    console.log({canvasSize, elementSize, canvasSizeOld});
     // se le da tamaño a los objetos
     game.font = elementSize +'px Verdana';
     //alinea el objeto o texto a la izquierda o derecha 
@@ -186,14 +197,16 @@ function gameWin(){
     // termina con la ejecucion del setinterval que ejecuta showTime
     clearInterval(timeInterval);
     // se le asigna el valor que esta alojado en record en el local storage
-    const recordTime = localStorage.getItem('record');
+    const memoriaLocal = localStorage.getItem('record');
+    const recordTime = Number(memoriaLocal)
+    const tiempoJugador = timePlayer/1000
     // condicional que nos permite validar si hay algo en recordTime
     if(recordTime){
         
-        if (recordTime > timePlayer){
+        if (recordTime > tiempoJugador){
             // si cordTiem es mayor a timePlayer se guarda en recor el valor del tiempo del jugador
             // e impreme un mensaje
-            localStorage.setItem('record', timePlayer);
+            localStorage.setItem('record', tiempoJugador);
             pResult.innerHTML = 'Superaste el record!!'
         }else {
             // si no solo imprime un mensaje
@@ -202,7 +215,7 @@ function gameWin(){
     }else{
         // de no cumplirse con el condicional solo se envia el valor de tiempo que se obtuvo 
         //por primera vez y se imprime un mensaje
-        localStorage.setItem('record', timePlayer);
+        localStorage.setItem('record', tiempoJugador);
 
         pResult.innerHTML = 'Primera vez?, intenta superar tu tiempo'
     }
@@ -227,7 +240,7 @@ function showTime(){
     // se inica el juego
     timePlayer = Date.now()-timeStart;
     // se imprime el valor del tiempo en html
-    spanTime.innerHTML = timePlayer ;
+    spanTime.innerHTML = Math.trunc(timePlayer / 1000) ;
     
 }
 
@@ -252,6 +265,13 @@ function repeatLevel(){
     playerPosition.x = undefined;
     playerPosition.y = undefined;
     startGame();
+}
+
+function reposicionar(){
+    const posicionx = playerPosition.x /canvasSizeOld.old;
+    const posiciony = playerPosition.y /canvasSizeOld.old;
+    playerPosition.x = posicionx *canvasSize;
+    playerPosition.y = posiciony *canvasSize;
 }
 
 window.addEventListener('keydown', moveByKey);
