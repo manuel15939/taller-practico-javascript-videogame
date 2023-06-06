@@ -29,6 +29,14 @@ canvas {
     width: 100%;
 }
 
+.btns2 {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    width: 100%;
+}
+
 button {
     background-color: #fdef05;
     border-radius: 8px;

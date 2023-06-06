@@ -4,6 +4,8 @@ const spanTime = document.querySelector('#time');
 const spanRecord = document.querySelector('#record');
 const pResult = document.querySelector('#mensaje');
 const game = canvas.getContext('2d');
+const reload = document.getElementById('reload');
+const btns = document.querySelector('.btns')
 let canvasSize;
 let elementSize;
 let level = 0;
@@ -64,6 +66,7 @@ function setCanvasSize (){
 }
 
 function startGame(){
+    reload.style.display = 'none';
     console.log({canvasSize, elementSize, canvasSizeOld});
     // se le da tamaño a los objetos
     game.font = elementSize +'px Verdana';
@@ -220,6 +223,8 @@ function gameWin(){
         pResult.innerHTML = 'Primera vez?, intenta superar tu tiempo'
     }
     console.log({recordTime,timePlayer});
+    reload.style.display = 'flex';
+    btns.style.display = 'none';
 }
 // funcion que muestra el numero de vidas 
 function showLives (){
@@ -258,7 +263,7 @@ function repeatLevel(){
     if (lives <= 0){
         level = 0;
         lives = 3;
-        timeStart = undefined;
+        timeStart;
     }
     console.log('vidas'+'='+lives);
     // se coloca undefine para reiniciar la posicion del jugador
@@ -314,6 +319,9 @@ function moverIzquierda(){
     }
 }
 
+function recargar () {
+    location.reload();
+}
 
 function moveByKey(event){
     switch (event.key) {
