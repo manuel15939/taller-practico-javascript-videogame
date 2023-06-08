@@ -279,12 +279,16 @@ function repeatLevel(){
         level = 0;
         lives = 3;
         timeStart;
+        canvasMsg('GAME OVER'+emojis['GAME_OVER']);
+        setTimeout(startGame ,1000)
+    }else{
+        playerPosition.x = undefined;
+        playerPosition.y = undefined;
+        startGame();
     }
     console.log('vidas'+'='+lives);
     // se coloca undefine para reiniciar la posicion del jugador
-    playerPosition.x = undefined;
-    playerPosition.y = undefined;
-    startGame();
+    
 }
 
 function reposicionar(){
