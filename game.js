@@ -33,6 +33,11 @@ const giftPosition = {
     y : undefined,
 }
 
+const boomPos = {
+    x : undefined,
+    y : undefined,
+} 
+
 let bombas = [];
 
 
@@ -72,7 +77,7 @@ function startGame(){
     game.font = elementSize +'px Verdana';
     //alinea el objeto o texto a la izquierda o derecha 
     game.textAlign = 'end';
-    
+
      // se crea una variable donde se extrae el primer mapa del arreglo maps
     const map = maps[level];
     // se crea una condicion para que cuando no halla mas mapas no se renderize de nuevo y termine 
@@ -162,9 +167,9 @@ function startGame(){
 
 function movePlayer (){
     // se compara la posicion de la meta en el eje x con la posicion del jugador y devuelve un true
-    const giftCollisionX = playerPosition.x.toFixed(3) == giftPosition.x.toFixed(3);
+    const giftCollisionX = playerPosition.x == giftPosition.x;
     // se compara la posicion de la meta en el eje y con la posicion del jugador y devuelve un true
-    const giftCollisionY = playerPosition.y.toFixed(3) == giftPosition.y.toFixed(3);
+    const giftCollisionY = playerPosition.y == giftPosition.y;
     // compara si las dos posiciones tanto en x como en y su estado es true
     const giftCollision = giftCollisionX && giftCollisionY;
     // esta condicion se ejecuta si en giftCollisin su estado es true
@@ -174,15 +179,17 @@ function movePlayer (){
     // se busca si las posiciones de los objetos enemigos coninciden con la posicion del jugador
     const bombasCollision = bombas.find(bomba => {
         // se compara la posicion de los objetos enemiogos en el eje x con la posicion del jugador y devuelve un true
-        const bombaCollisionX = bomba.x.toFixed(3) == playerPosition.x.toFixed(3);
+        const bombaCollisionX = bomba.x == playerPosition.x;
         // se compara la posicion de los objetos enemiogos en el eje x con la posicion del jugador y devuelve un true
-        const bombaCollisionY = bomba.y.toFixed(3) == playerPosition.y.toFixed(3);
+        const bombaCollisionY = bomba.y == playerPosition.y;
         // se devuelve un true si las dos variables cumplen con ese estado
         return bombaCollisionX && bombaCollisionY
     })
     // esta condicion se ejecuta si en bombasCollision su estado es true
     if (bombasCollision){
-        repeatLevel()
+        showCollision();
+        canvasMsg('BOOM'+emojis['LOSER']);
+        setTimeout (repeatLevel, 1000)
     }
 
     game.fillText(emojis['PLAYER'], playerPosition.x,playerPosition.y)
@@ -191,7 +198,11 @@ function movePlayer (){
 function levelWin(){
     console.log('Subiste de nivel');
     level++;
-    startGame()
+    game.fillText(emojis['WIN'], giftPosition.x,giftPosition.y)
+    playerPosition.x = undefined;
+    playerPosition.y = undefined;
+    setTimeout (startGame, 100)
+    
 }
 
 // funcion que termina el juego
@@ -207,7 +218,7 @@ function gameWin(){
     if(recordTime){
         
         if (recordTime > tiempoJugador){
-            // si cordTiem es mayor a timePlayer se guarda en recor el valor del tiempo del jugador
+            // si recordTiem es mayor a timePlayer se guarda en record el valor del tiempo del jugador
             // e impreme un mensaje
             localStorage.setItem('record', tiempoJugador);
             pResult.innerHTML = 'Superaste el record!!'
@@ -223,8 +234,12 @@ function gameWin(){
         pResult.innerHTML = 'Primera vez?, intenta superar tu tiempo'
     }
     console.log({recordTime,timePlayer});
+    game.fillText(emojis['WIN'], giftPosition.x,giftPosition.y)
+    playerPosition.x = undefined;
+    playerPosition.y = undefined;
     reload.style.display = 'flex';
     btns.style.display = 'none';
+    canvasMsg('YOU WIN'+emojis['WIN']);
 }
 // funcion que muestra el numero de vidas 
 function showLives (){
@@ -279,6 +294,28 @@ function reposicionar(){
     playerPosition.y = posiciony *canvasSize;
 }
 
+function showCollision(){
+    boomPos.x = playerPosition.x
+    boomPos.y = playerPosition.y
+    game.fillText(emojis['BOMB_COLLISION'], boomPos.x,boomPos.y)
+    playerPosition.x = undefined;
+    playerPosition.y = undefined;
+}
+
+function canvasMsg(msj){
+    game.fillStyle = 'purple';
+    game.fillRect((canvasSize*0.15), (canvasSize*0.35), (canvasSize*0.7), canvasSize/4);
+    game.fillStyle = 'yellow';
+    game.font = (canvasSize*0.1)+'px arial'
+    game.textAlign = 'center';
+    game.fillText(msj,(canvasSize/2),(canvasSize/2));
+}
+
+
+function recargar () {
+    location.reload();
+}
+
 window.addEventListener('keydown', moveByKey);
 
 function moverArriba(){
@@ -317,10 +354,6 @@ function moverIzquierda(){
         playerPosition.x -= elementSize
         startGame();
     }
-}
-
-function recargar () {
-    location.reload();
 }
 
 function moveByKey(event){
